@@ -1,0 +1,807 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Untitled Document</title>
+<script>
+var len;
+	function clear_all_textboxes()
+	{
+		var txt="rate_box";
+		//var txt2="rate_box_name";
+		
+		var check=document.getElementsByClassName(txt);
+		var room_number=document.getElementsByClassName('room_no_display');
+		var room_r_d=document.getElementsByClassName('room_rate_display');
+		var room_a_d=document.getElementsByClassName('room_amount_display');
+		var cbd=document.getElementsByClassName('checkbox_display');
+		//var check2=document.getElementsByClassName(txt2);
+		var i;
+	
+		for(i=0;i<check.length;i++)
+		{
+			
+				check[i].value="";
+				check[i].name="null";
+				check[i].style.display='none';
+				room_number[i].innerHTML='';
+				room_r_d[i].innerHTML='';
+				room_a_d[i].innerHTML='';
+				cbd[i].style.visibility='hidden';
+				/*check2[i].innerHTML="";
+				check2[i].name="null";
+				check2[i].style.display='none';*/
+				
+			
+		}
+	}
+	
+	function poll(e,a,n)
+	{
+		
+		clear_other_checkboxes(n);
+		clear_all_textboxes();
+		proceed_for_checkout();
+		var flag=false;
+		var cl=e;
+		var i=a.toString();
+		var is_parent_checked=false;
+		
+		var checkbox=document.getElementById(i);
+		if(checkbox.checked)
+		{
+			is_parent_checked=true;
+			flag=true;
+			document.getElementById('guest_name').innerHTML=n;
+		}
+		else
+		{
+			is_parent_checked=false;
+			//document.getElementById('guest_name').value='';
+		}
+		
+		if(e=='parent')
+		{
+			poll_child(is_parent_checked,n);
+		}
+		set_textboxes();
+		set_forward_rooms(n);
+		
+		
+	}
+	function set_forward_rooms(e)
+	{
+		var clear_a=document.getElementsByName('forward_info');
+		var a;
+		for(a=0;a<clear_a.length;a++)
+		{
+			clear_a[a].value='';
+		}
+		var group=document.getElementsByTagName('input');
+		var i;
+		var temp;
+		for(i=0;i<group.length;i++)
+		{
+			if(group[i].name==e && group[i].type=='checkbox' && group[i].checked==true)
+			{
+				//alert(group[i].name);
+				var tmp=document.getElementsByName(e);
+				var k;
+				for(k=0;k<tmp.length;k++)
+				{
+				//	alert(tmp[k].id);
+					t="forward_info"+tmp[k].id;
+					a="room"+tmp[k].id;
+					document.getElementById(t).value=document.getElementById(a).value;
+				}
+				break;
+			}
+		}
+	}
+	function set_textboxes()
+	{
+		var ct=0;
+		var text_b=document.getElementsByClassName('rate_box');
+		//var para_b=document.getElementsByClassName('rate_box_name');
+		var room_number=document.getElementsByClassName('room_no_display');
+		var room_amount_d=document.getElementsByClassName('room_amount_display');
+		var room_rate_d=document.getElementsByClassName('room_rate_display');
+		var cbd=document.getElementsByClassName('checkbox_display');
+		var check_b=document.getElementsByTagName('input');
+		var i;
+		var tmp;
+		var str;
+		for(i=0;i<check_b.length;i++)
+		{
+			if(check_b[i].type=='checkbox')
+			{
+			   
+			   if(check_b[i].checked)
+			   {
+				  	tmp=document.getElementById(check_b[i].id);
+					str="rate"+tmp.id;
+					str2="name_a"+tmp.id;
+					str3="room"+tmp.id;
+					str5="room_amount"+tmp.id;
+					str4="room_rate"+tmp.id;
+					/*para_b[ct].innerHTML=document.getElementById(str2).value;
+					para_b[ct].name="name_for_"+tmp.id;
+					para_b[ct].style.display='block';*/
+					room_amount_d[ct].innerHTML=document.getElementById(str5).value;
+					room_rate_d[ct].innerHTML=document.getElementById(str4).value;
+					
+					text_b[ct].value=document.getElementById(str).value;
+					text_b[ct].name="rate_for_"+tmp.id;
+					text_b[ct].style.display='block';
+					room_number[ct].innerHTML=document.getElementById(str3).value;
+					cbd[ct].style.visibility='visible';
+					//alert(document.getElementById(str3).value);
+					
+					
+					ct++;
+			   }
+			   
+			}
+		}
+		if(ct==0)
+		{
+			document.getElementById('guest_name').innerHTML='';	
+			document.getElementById('d').style.height="0px";
+		}
+		else
+		{
+			
+				len=ct*72;
+			document.getElementById('d').style.height=len+"px";
+		}
+	}
+	function poll_child(parent_state,guest_name)
+	{
+		children=document.getElementsByName(guest_name);
+		var i;
+		
+		
+		if(parent_state)
+		{
+			for(i=0;i<children.length;i++)
+			{
+				children[i].checked=true;
+					
+			}
+		}
+		else
+		{
+			for(i=0;i<children.length;i++)
+			{
+				children[i].checked=false;
+			}
+		}
+	}
+	function clear_other_checkboxes(chk_name)
+	{
+		
+		var check=document.getElementsByTagName('input');
+		var i;
+	
+		for(i=0;i<check.length;i++)
+		{
+			if(check[i].name!=chk_name)
+			{
+				check[i].checked=false;		
+			}
+		}
+	}
+	function clear_checkout_info()
+	{
+		var a=document.getElementsByClassName('final_room_no');
+		var c=document.getElementsByClassName('final_room_no_info');
+		var b=document.getElementsByClassName('final_amount');
+		var i;
+		for(i=0;i<a.length;i++)
+		{
+			a[i].innerHTML='';
+			b[i].innerHTML='';
+			c[i].value='';
+		}	
+	}
+	function proceed_for_checkout()
+	{
+		clear_checkout_info();
+		var total=0;
+		var a=0;
+		var check_d=document.getElementsByClassName('checkbox_display');
+		var inp=document.getElementsByClassName('rate_box');
+		var room_no=document.getElementsByClassName('room_no_display');
+		var room_rate=document.getElementsByClassName('room_rate_display');
+		var room_amount=document.getElementsByClassName('room_amount_display');
+		var i;
+		for(i=0;i<check_d.length;i++)
+		{
+			if(check_d[i].checked==true)
+			{
+				document.getElementsByClassName('final_room_no')[a].innerHTML=room_no[i].innerHTML;
+				document.getElementsByClassName('final_room_no_info')[a].value=room_no[i].innerHTML;
+				document.getElementsByClassName('final_amount')[a].innerHTML=room_amount[i].innerHTML;
+				total+=parseInt(document.getElementsByClassName('final_amount')[a].innerHTML);
+				
+				a++;
+				if(a==1)	
+				h=a*100;
+				else
+				h=a*64;
+				document.getElementById('proceed').style.height=h+'px';
+				document.getElementById('dsc').style.height=h+'px';
+				document.getElementById('dsc2').style.height=h+'px';
+				document.getElementById('dsc3').style.height=h+'px';
+				document.getElementById('dsc4').style.height=h+'px';
+				
+				
+			}
+		}
+		if(total!=0)
+		{
+			document.getElementsByClassName('final_total_amount')[0].value=total;
+		
+			
+		
+		}
+		else
+		{
+			document.getElementById('proceed').style.height='0px';
+		document.getElementById('dsc').style.height='0px';
+				document.getElementById('dsc2').style.height='0px';
+				document.getElementById('dsc3').style.height='0px';
+				document.getElementById('dsc4').style.height='0px';
+				document.getElementById('div_n').style.height='0px';
+				document.getElementById('forward_button').style.height='0px';
+		}
+		
+	}
+	function calculate_discount()
+	{
+		if(document.getElementById('f_d').value!='')
+		{
+			var total=parseInt(document.getElementsByClassName('final_total_amount')[0].value);
+			var discount=parseInt(document.getElementById('f_d').value);
+			var dsc=total-discount;
+			document.getElementsByClassName('final_total_amount')[0].value=dsc;
+		}
+	}
+	function show_forward_info()
+	{
+		var rooms=document.getElementsByName('forward_info');
+		var radio_b=document.getElementsByName('forward_room_no');
+		var para_b=document.getElementsByName('forward_room_display');
+		var i;
+		var ctr=0;
+		for(i=0;i<radio_b.length;i++)
+		{
+		//	rooms[i].value='null';
+			radio_b[i].value='null';
+			para_b[i].value='null';
+			para_b[i].innerHTML='';
+		}
+		
+		var room_index=0;
+		var k,flag=false;;
+		for(i=0;i<rooms.length;i++)
+		{
+			flag=false;
+			if(rooms[i].value!='' || rooms[i].value!=null)
+			{
+				
+				checkout_rooms=document.getElementsByClassName('final_room_no');
+				for(k=0;k<checkout_rooms.length;k++)
+				{
+					//alert(rooms[i].value + " "+checkout_rooms[k].innerHTML);
+					if(rooms[i].value==checkout_rooms[k].innerHTML &&checkout_rooms[k].innerHTML!=null)
+					{
+						flag=true;
+					}
+				}
+			}
+			if(!flag)
+			{	
+			
+				radio_b[room_index].value=rooms[i].value;
+				para_b[room_index].innerHTML=rooms[i].value;
+				room_index++;
+				t=room_index*50;
+				ht=t+'px';
+				if(rooms[i].value.toString().length>1)
+				{
+					document.getElementById('div_n').style.height=ht;
+					document.getElementById('forward_button').style.height=ht;
+				
+				ctr++;
+				}
+				//alert(rooms[i].value);
+			
+			}
+			
+			if(ctr==0)
+			{
+				document.getElementById('div_n').style.height='0px';
+				document.getElementById('forward_button').style.height='0px';
+			}
+		}
+	}
+</script>
+<style>
+	
+	.gs
+	{
+		background-color:white;
+		transition:.5s;
+		height:0;
+		overflow:hidden;
+		border:1px solid #4A8BC2;;
+		color:#666;
+		font-family:'Segoe UI';
+		width:492px;
+		
+		
+		
+		
+	}
+	.header
+	{
+	background-color:white;
+		transition:.5s;
+		height:0;
+		overflow:hidden;
+		border:1px solid #4A8BC2;;
+		color:#666;
+		font-family:'Segoe UI';
+		
+	}
+	.room_div
+	{
+		background-color:#415cc9;
+		position:fixed;
+		height:100%;
+		top:0px;
+		font-size:14px;
+		font-face:'Segoe UI';
+		
+		
+	}
+	body
+	{
+		margin:0;
+	}
+	.rate_box
+	{
+		outline:none;
+		
+		border: 1.5px solid #ccc;
+		
+		padding:5px 5px;
+		width:40px;
+		height:20px;
+		transition:.5s;
+		font-family:'Segoe UI';
+		transition: .5s;
+		display:block;
+		text-align:center;
+		
+	}
+	.final_discount
+	{
+	outline:none;
+		
+		border: 1.5px solid #ccc;
+		
+		padding:1px 1px;
+		//width:80px;
+		height:20px;
+		transition:.5s;
+		font-family:'Segoe UI';
+		transition: .5s;
+		display:block;
+		text-align:center;
+	}
+	.final_total_amount
+	{
+	outline:none;
+		
+		border: 1.5px solid #ccc;
+		
+		padding:1px 1px;
+		//width:80px;
+		height:20px;
+		transition:.5s;
+		font-family:'Segoe UI';
+		transition: .5s;
+		display:block;
+		text-align:center;
+	}
+	.proceed
+	{
+		height:0;
+		
+		
+		
+		background-color:white;
+		transition:.5s;
+		
+		overflow:hidden;
+		border:1px solid #4A8BC2;;
+		color:#666;
+		font-family:'Segoe UI';
+		
+		width:160px;
+	}
+	.dsc
+	{
+		height:0;
+		
+		
+		background-color:white;
+		transition:.5s;
+		
+		overflow:hidden;
+		border:1px solid #4A8BC2;;
+		color:#666;
+		font-family:'Segoe UI';
+		font-size:14px;
+		
+		width:160px;
+	}
+	
+	.div_n
+	{
+		height:0;
+		
+		
+		background-color:white;
+		transition:.5s;
+		
+		overflow:hidden;
+		border:1px solid #4A8BC2;;
+		color:#666;
+		font-family:'Segoe UI';
+		font-size:14px;
+		
+		width:160px;
+	}
+	
+	.forward_button
+	{
+		height:0;
+		
+		
+		background-color:white;
+		transition:.5s;
+		
+		overflow:hidden;
+		border:1px solid #4A8BC2;;
+		color:#666;
+		font-family:'Segoe UI';
+		font-size:14px;
+		
+		width:320px;
+	}
+	.guest_name
+	{
+		
+		height:40px;
+		font-family:'Segoe UI';
+		font-size:18px;
+	}
+	
+	.dsc4
+	{
+		height:0;
+		
+		
+		background-color:white;
+		transition:.5s;
+		
+		overflow:hidden;
+		border:1px solid #4A8BC2;;
+		color:#666;
+		font-family:'Segoe UI';
+		font-size:14px;
+		
+		width:160px;
+	}
+	.dsc3
+	{
+		transition: .5s;
+	}
+	.button
+	{
+		
+		border:none;
+		background-color:#CCCCCC;
+		font-size:16px;
+		padding:7px 14px;
+		transition: .5s;
+		width:100px;		
+	}
+	.button:hover
+	{
+		background-color:#999;
+		
+	}
+	
+	
+	.rate_box_name
+	{
+		
+		color:#666;
+		font-family:'Segoe UI';
+		
+	}
+	.room_td
+	{
+		background-color:#FFF;
+	//	border:1px solid #4A8BC2;
+		box-shadow:0.1px 0.1px 0.1px #333333;
+	}
+	.guest_name
+	{
+		font-size:20px;
+	}
+	.body
+	{
+		margin-left:325px;
+	}
+	
+	
+</style>
+</head>
+
+<body bgcolor="#f1f1f1">
+
+
+<div id="room_div" class="room_div">
+<table cellpadding="12" cellspacing="12">
+<tr>
+<?php
+$conn=mysqli_connect("localhost","root","");
+	$db=mysqli_select_db($conn,"hotel_db");
+	
+if(isset($_POST['Foreward']))
+{
+	
+	$str='';
+	if(!empty($_POST['submit_room_no']))
+	{
+		foreach($_POST['submit_room_no'] as $room)
+		{
+			if($room !='')
+			{
+				$str=$str.$room.",";
+			}
+		}
+	}
+	
+}
+date_default_timezone_set('Asia/Kolkata');
+	
+	/*if(isset($_POST['submit']))
+	{
+		foreach($_POST['Anish Sharma'] as $a)
+		{
+			echo $a;
+		}
+	}*/
+	
+	$query1="select * from room_info where status=0";
+	$result1=mysqli_query($conn,$query1);
+	$ctr=0;
+	while($room_info=mysqli_fetch_assoc($result1))
+	{
+		$query2="select * from booking_detail where room_id='$room_info[room_id]'";
+		$result2=mysqli_query($conn,$query2);
+		
+		$booking_detail=mysqli_fetch_assoc($result2);
+		
+		$queryn="select count(booking_id) as rows from booking_detail group by booking_id";
+		$resultn=mysqli_query($conn,$queryn);
+		$maxrows=0;
+		while($ct=mysqli_fetch_assoc($resultn))
+		{
+				if($ct['rows']>$maxrows)
+				{
+					$maxrows=$ct['rows'];	
+				}
+		}
+		//echo $maxrows;
+		//echo "ok".$booking_detail['accompany_name'];
+		$query3="select * from booking_master where booking_id='$booking_detail[booking_id]'";
+		$result3=mysqli_query($conn,$query3);
+		
+		$booking_master=mysqli_fetch_assoc($result3);
+		$no=date_create($booking_master['checkin_date']);
+		$dt=date("Y-m-d");
+		$d=date_create($dt);
+		
+		$diff=date_diff($d,$no);
+		$t_d=$diff->format("%a");
+		if(date('H')>10)
+		 $t_d+=1;
+		if($booking_master['guest_name']==$booking_detail['accompany_name'])	
+			$class="parent";
+		else
+			$class="child";
+		
+			?>
+				<td class="room_td"><input type="checkbox" class='<?php echo $class;?>' name='<?php echo $booking_master['guest_name'];?>' id='<?php echo $booking_detail['room_id']; ?>' onClick="poll('<?php echo $class;?>','<?php echo $booking_detail['room_id'];?>','<?php echo $booking_master['guest_name'];?>')"><?php echo $room_info['c_room_no'];?><br/><input type="hidden" value='<?php echo $t_d;?>' id='<?php echo "rate".$booking_detail['room_id']?>'>
+                
+                
+                <input type="hidden" value='<?php echo $booking_detail['accompany_name'];?>' id='<?php echo "name_a".$booking_detail['room_id']?>'>
+                <input type="hidden" id='<?php echo "room".$booking_detail['room_id'];?>' value='<?php echo $room_info['c_room_no'];?>'>
+                <input type="hidden" id='<?php echo "room_amount".$booking_detail['room_id'];?>' value='<?php $a=$room_info['rate']*$t_d; echo $a; ;?>'>
+                <input type="hidden" id='<?php echo "room_rate".$booking_detail['room_id'];?>' value='<?php echo $room_info['rate'];?>'>
+                <input type="hidden" name="forward_info" id='<?php echo "forward_info".$booking_detail['room_id']; ?>' size="1" class='<?php echo $booking_master['guest_name'];?>'>
+                
+                </td>
+			<?php
+			$ctr++;
+			if($ctr %4==0)
+			{	?></tr><tr><?php } 
+	}
+?>
+</tr>
+</table>
+</div>
+<div class="body">
+<table cellspacing="20">
+<tr>
+<td valign="top">
+<div class="guest_name">
+
+<p class="guest_name" id="guest_name"></p>
+</div>
+<table width="494" cellpadding="7" cellspacing="7" class="header">
+<tr align="center">
+<td width="89">Room No</td>
+<td width="88">No of Days</td>
+<td width="41">Rate</td>
+<td width="63">Amount</td>
+<td width="100">Proceed </td>
+</tr>
+</table>
+<div class="gs" id="d">
+
+<table width="493" height="56"  cellpadding="7" cellspacing="7">
+<tr align="center">
+
+<?php
+	$i=0;
+	while($i<$maxrows)
+	{
+		?>
+        <td width="86"><p class="room_no_display" id='<?php echo "room_no_display".$i;?>'></p></td>
+        
+		<td class="a" width="91" ><!--<p class="rate_box_name" style="font-face:'Segoe UI';"></p>--><input type="text" class="rate_box" id='<?php echo "rate_box".$i;?>'  name="null" style="display:none" size="2"></td>
+        
+         <td width="41"><p class="room_rate_display" id='<?php echo "room_rate_display".$i;?>'></p></td>
+         <td width="62"><p class="room_amount_display" id='<?php echo "room_amount_display".$i;?>'></p></td>
+          <td width="99"><input type="checkbox" style="visibility:hidden" class="checkbox_display" id='<?php echo "roomcheckbox_display".$i;?>' onClick="proceed_for_checkout()"></td>
+          </tr><tr align="center">
+          
+		<?php
+		$i++;
+	}
+?>
+</tr>
+</table>
+</div>
+</td><td valign="top" >
+
+<br/>
+<div class="guest_name">Checkout Summary</div>
+<table width="486" cellpadding="7" cellspacing="7" class="header">
+<tr align="center">
+<td width="53">Room </td>
+<td width="61">Amount</td>
+<td width="137">Total</td>
+
+<td width="142">Action</td>
+</tr>
+</table>
+<table cellspacing="0" cellpadding="0">
+<tr>
+<td width="162">
+<div class="proceed" id="proceed">
+
+<table width="186" height="41" cellpadding="0" cellspacing="0">
+<tr>
+<?php 
+	$a=0;
+	while($a<$maxrows)
+	{
+		?>
+        <td width="58" align="center"><p  class="final_room_no" ></p><input type="hidden"  class="final_room_no_info" name="submit_room_no[]" > </td>
+        <td width="100" align="center"><p class="final_amount"></p></td>
+      
+       
+        
+		
+        
+        </tr><tr>
+		<?php
+		$a++;
+	}
+?>
+</tr>
+</table>
+</div>
+</td>
+<td width="162">
+<div class="dsc" id="dsc">
+<table  id="dsc2" align="center">
+<tr>
+ <td  ><table><tr><td> Discount</td><td><input type="text" class="final_discount" size="3" id="f_d" onChange="calculate_discount()"></td></tr></table>
+        <table><tr><td>Total&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td><input type="text" class="final_total_amount" name="final_total_amount" size="3"></td></tr></table>
+        </td>
+        </tr>
+</table>
+
+</div>
+</td>
+<td width="160">
+<div class="dsc4" id="dsc4">
+<table  id="dsc3" align="center">
+<tr>
+ <td ><input type="submit" value="Pay" class="button">
+
+<br/><br/><input type="button" class="button" onClick="show_forward_info()">Forward</button>
+</td>
+</tr>
+</table>
+
+
+</div>
+</td></tr>
+
+<tr><td>
+<div class="div_n" id= "div_n">
+<?php 
+	$ab=0;
+	?>
+	<table>
+    <tr>
+	<?php
+	while($ab<$maxrows-1)
+	{
+		?>
+			<td><input type="radio" name="forward_room_no" value="null"></td><td><p name="forward_room_display">
+            </p>
+            </td></tr><tr>
+		<?php
+		$ab++;
+	}
+	?>
+    </tr>
+    </table>
+    </div>
+
+</td>
+
+<td colspan="2" align="center" valign="middle">
+<div class="forward_button" id="forward_button">
+<input type="button" class="button">ok</div>
+</div>
+</td>
+
+</tr>
+</table>
+
+
+    </td></tr></table>
+<!--<table width="557" ><tr><td align="right">
+
+<button value="proceed" onClick="proceed_for_checkout()" class="button">Proceed</button></td></tr></table>-->
+
+
+
+
+</div>
+</body>
+</html>
+
